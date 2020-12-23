@@ -26,6 +26,8 @@ Promise.all([
 
   await writeFile('pages/posts.html', postsHtml)
 
+  fs.mkdirSync('pages/posts')
+
   await Promise.all(
     posts.map(async post => {
       const html = template({
