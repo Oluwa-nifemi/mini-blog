@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    >
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blog Posts</title>
+</head>
+<body>
+    <h1>
+        Blog Posts
+    </h1>
+    <hr>
+    {{#each posts}}
+        <div>
+            <h3>
+                {{this.title}}
+            </h3>
+            <p>
+                {{this.excerpt}}
+            </p>
+            <a href="/posts/{{this.slug}}.html">Go to post</a>
+            <hr>
+        </div>
+    {{/each}}
+</body>
+</html>

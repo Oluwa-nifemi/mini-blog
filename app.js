@@ -9,13 +9,22 @@ const axios = require('axios');
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
-readFile('blog-template.hbs', 'utf8').then(async (file) => {
-  console.log(`${process.env.GHOST_API_URL}/api/v3/content/posts?key=${process.env.GHOST_API_KEY}`);
+Promise.all([
+  readFile('blog-posts-template.hbs', 'utf8'),
+  readFile('post-template.hbs', 'utf8'),
+]).then(async ([listPostsFile, postFile ]) => {
   const response = await axios(`${process.env.GHOST_API_URL}/api/v3/content/posts?key=${process.env.GHOST_API_KEY}`);
 
   const posts = response.data.posts;
 
-  const template = Handlebars.compile(file);
+  const template = Handlebars.compile(postFile);
+  const listPostsTemplate = Handlebars.compile(listPostsFile);
+
+  const postsHtml = listPostsTemplate({
+    posts
+  })
+
+  await writeFile('pages/posts.html', postsHtml)
 
   await Promise.all(
     posts.map(async post => {
