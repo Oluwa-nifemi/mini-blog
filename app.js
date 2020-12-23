@@ -1,19 +1,32 @@
-const {promisify} = require('util')
-const fs = require('fs')
-const Handlebars = require("handlebars")
+require('dotenv').config();
 
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
+const {promisify} = require('util');
+const fs = require('fs');
+
+const Handlebars = require('handlebars');
+const axios = require('axios');
+
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 
 readFile('blog-template.hbs', 'utf8').then(async (file) => {
-  const template = Handlebars.compile(file)
+  console.log(`${process.env.GHOST_API_URL}/api/v3/content/posts?key=${process.env.GHOST_API_KEY}`);
+  const response = await axios(`${process.env.GHOST_API_URL}/api/v3/content/posts?key=${process.env.GHOST_API_KEY}`);
 
-  const html = template({
-    title: 'Cat',
-    author: 'nifmei',
-    date: '20th',
-    content: '<p>Every single fight</p>'
-  })
+  const posts = response.data.posts;
 
-  await writeFile('pages/posts/1.html', html)
-})
+  const template = Handlebars.compile(file);
+
+  await Promise.all(
+    posts.map(async post => {
+      const html = template({
+        title: post.title,
+        author: 'Nifemi',
+        date: post.published_at,
+        content: post.html
+      });
+
+      await writeFile(`pages/posts/${post.slug}.html`, html);
+    })
+  );
+});
